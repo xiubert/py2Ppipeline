@@ -36,6 +36,7 @@ suite2PoutputDir = os.path.join(tifDir,'suite2p','plane0')
 
 #%% analyze animal with stim output
 animalOutput = flow2P.animal2P(tifDir,suite2PoutputDir)
+animalOutput.TRFcalc()
 
 #%% output plots
 #plot average traces across ROI | PUT THIS IN flow2P as a plotting function?
@@ -56,23 +57,22 @@ for group_name, df_group in uROI.groupby(np.asarray(groups)[~np.isin(groups,['ro
     plt.ylabel('Firing Rate (Hz)')
     plt.xticks(np.arange(0,75,10),(np.arange(0,75,10)/5)-4)
     plt.xlabel('Time (s)')
-
-#%%    
-animalOutput.TRFcalc()
-
-#%% get common BF:
-animalOutput.TRF.freq[np.argmax([sum(np.isin(animalOutput.TRF.BF,fq))\
-                                 for fq in animalOutput.TRF.freq])]
-#or
-from scipy import stats
-stats.mode(np.asarray(animalOutput.TRF.BF))
+  
 
 #%% plot traces from cells with BF within 1 octave from pure-tone stimulus
 octLim = 1
+onset = 2
 
-uROIwithin = animalOutput.dfStim[animalOutput.dfStim['BFoctDiff'].abs()<octLim]\
+# uROIwithin = animalOutput.dfStim[animalOutput.dfStim['BFoctDiff'].abs()<octLim]\
+#     .groupby(groups)['spks'].apply(np.mean)\
+#         .groupby(np.asarray(groups)[~np.isin(groups,'roi')].tolist()).apply(np.mean)
+
+uROIwithin = animalOutput.dfStim.loc[\
+    (animalOutput.dfStim['BFoctDiff'].abs() < octLim)\
+        & (animalOutput.dfStim['PTonset_s']==onset)]\
     .groupby(groups)['spks'].apply(np.mean)\
         .groupby(np.asarray(groups)[~np.isin(groups,'roi')].tolist()).apply(np.mean)
+
 
 for group_name, df_group in uROIwithin\
     .groupby(np.asarray(groups)[~np.isin(groups,['roi','contrast'])].tolist()):
@@ -86,4 +86,12 @@ for group_name, df_group in uROIwithin\
     plt.ylabel('Firing Rate (Hz)')
     plt.xticks(np.arange(0,75,10),(np.arange(0,75,10)/5)-4)
     plt.xlabel('Time (s)')
-# %%
+
+
+    
+#%% get common BF:
+animalOutput.TRF.freq[np.argmax([sum(np.isin(animalOutput.TRF.BF,fq))\
+                                 for fq in animalOutput.TRF.freq])]
+#or
+from scipy import stats
+stats.mode(np.asarray(animalOutput.TRF.BF))
