@@ -179,16 +179,38 @@ def getTifTreatment(tifDir,maxTimeBWtif=18,afterXtifs=10):
         treatmentKey = []
         ppID = 0
         tifNo = 0
-        for entry in os.scandir(tifDir):
-            if entry.is_file() and '.tif' in entry.name:
-                tifNo += 1
-                mTime.append(entry.stat().st_mtime)
+        try:
+            for entry in os.scandir(tifDir):
+                if entry.is_file() and '.tif' in entry.name:
+                    tifNo += 1
+                    mTime.append(entry.stat().st_mtime)
         
-                if (len(mTime)>1 and (mTime[-1]-mTime[-2])/60)<maxTimeBWtif or tifNo<afterXtifs:
-                    treatmentKey.append(_pp[ppID] + drug)
-                else:
-                    ppID += 1
-                    treatmentKey.append(_pp[ppID] + drug)
+                    if (len(mTime)>1 and (mTime[-1]-mTime[-2])/60)<maxTimeBWtif or tifNo<afterXtifs:
+                        treatmentKey.append(_pp[ppID] + drug)
+                    else:
+                        ppID += 1
+                        treatmentKey.append(_pp[ppID] + drug)
+        
+        except (IndexError):
+            ppID = 0
+            treatmentKey = []
+
+            if len(glob.glob(os.path.join(tifDir,'lastPreTreatmentTif_*'))) != 0:
+                lastPreTif = os.path.basename(glob.glob(os.path.join(tifDir,'lastPreTreatmentTif_*'))[0].replace('lastPreTreatmentTif_',''))
+            else:
+                lastPreTif = input('Enter last pre-treatment .tif file name:\n').replace('.tif','')
+                from pathlib import Path
+                Path(os.path.join(tifDir,'lastPreTreatmentTif_' + lastPreTif)).touch()
+            
+            for entry in os.scandir(tifDir):
+                if entry.is_file() and '.tif' in entry.name:
+                            
+                    if entry.name == lastPreTif + '.tif':
+                        treatmentKey.append(_pp[ppID] + drug)
+                        ppID += 1
+                    else:
+                        treatmentKey.append(_pp[ppID] + drug)
+
         return treatmentKey
 
 

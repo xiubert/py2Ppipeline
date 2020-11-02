@@ -19,8 +19,10 @@ import flow2P
 
 
 #%% INPUT DATA DIRECTORY
-tifDir = r'D:\Data\Patrick\processed2P\ZnT3_5-52kHz_G2\ZN0001'
+# tifDir = r'D:\Data\Patrick\processed2P\ZnT3_5-52kHz_G2\ZN0001'
 # tifDir = r'D:\Data\Patrick\processed2P\CaMKII_5-25kHz\AA0104'
+tifDir = r'D:\Data\Patrick\processed2P\CaMKII_5-52kHz\AA0203'
+
 suite2PoutputDir = os.path.join(tifDir,'suite2p','plane0')
 
 
@@ -32,7 +34,6 @@ suite2PoutputDir = os.path.join(tifDir,'suite2p','plane0')
 # TRF = flow2P.animalTRF(dfMap,dfTif,iscell,suite2PoutputDir) #defaults to pre, TRF is TRFpre
 # TRFpre = flow2P.animalTRF(dfMap,dfTif,iscell,suite2PoutputDir,treatment='pre')
 # TRFpost = flow2P.animalTRF(dfMap,dfTif,iscell,suite2PoutputDir,treatment='post')
-
 
 #%% analyze animal with stim output
 animalOutput = flow2P.animal2P(tifDir,suite2PoutputDir)
